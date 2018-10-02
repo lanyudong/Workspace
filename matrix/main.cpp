@@ -1,3 +1,5 @@
+#include "tsu.h"
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -17,6 +19,15 @@ int main()
     }
 
     for (const auto &row : matrix) {
+        for (const auto &col : row) {
+            cout << col << '\t';
+        }
+        cout << endl;
+    }
+
+    tsu::string_matrix str_mat = tsu::FileToMatrix("data.csv", ',', 3);
+
+    for (const auto &row : str_mat) {
         for (const auto &col : row) {
             cout << col << '\t';
         }

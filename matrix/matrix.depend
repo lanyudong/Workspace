@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1538439210 source:/home/tylor/dev/Workspace/matrix/main.cpp
+	"tsu.h"
+	<iostream>
+	<vector>
+	<string>
+
+1538435170 /home/tylor/dev/Workspace/matrix/tsu.h
+	<iostream>
+	<fstream>
+	<sstream>
+	<string>
+	<vector>
+	<regex>
+	<ctime>
+
