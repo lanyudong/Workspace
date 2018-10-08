@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1539041383 source:/home/bess/dev/Workspace/Modbus/main.cpp
+	<iostream>
+	<limits>
+	<modbus/modbus-tcp.h>
+
