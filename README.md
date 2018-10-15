@@ -10,13 +10,16 @@ click: Project -> Build options
 check: Have g++ follow the C++11 ISO C++ language standard
 
 #### Linker settings
-Add: -l(name of library)
+The linker will search in the default lib path first, and then any custom paths set in the search directories for designated -l(libaries).
+
+enter: -l(name of library)
 
 #### Search directories
 
 ##### Compiler
-Add: /(path to include folder)
+Other linker options:
+add: /(path to include folder)
 
 ##### Linker
-Add: /(path to lib folder)
+add: /(path to lib folder)
 
