@@ -1,8 +1,15 @@
 # depslib dependency file v1.0
-1539041383 source:/home/bess/dev/Workspace/Modbus/main.cpp
+1539900399 source:/home/bess/dev/Workspace/Modbus/main.cpp
 	<iostream>
-	<limits>
+	<iomanip>
+	<sstream>
+	<vector>
+	<string>
+	<map>
 	<modbus/modbus-tcp.h>
+	<boost/property_tree/ptree.hpp>
+	<boost/property_tree/xml_parser.hpp>
+	<boost/foreach.hpp>
 
 1539833009 source:/home/tylor/dev/Workspace/Modbus/main.cpp
 	<iostream>
@@ -21,11 +28,11 @@
 
 1539798573 /home/tylor/dev/Workspace/Modbus/include/Modbus.h
 
-1539629183 /usr/local/include/modbus/modbus-tcp.h
+1539036197 /usr/local/include/modbus/modbus-tcp.h
 	"modbus.h"
 	<winsock2.h>
 
-1539629183 /usr/local/include/modbus/modbus.h
+1539036197 /usr/local/include/modbus/modbus.h
 	<sys/param.h>
 	<stdint.h>
 	"stdint.h"
@@ -33,9 +40,9 @@
 	"modbus-tcp.h"
 	"modbus-rtu.h"
 
-1539629183 /usr/local/include/modbus/modbus-version.h
+1539036197 /usr/local/include/modbus/modbus-version.h
 
-1539629183 /usr/local/include/modbus/modbus-rtu.h
+1539036197 /usr/local/include/modbus/modbus-rtu.h
 	"modbus.h"
 
 1513209407 /home/tylor/src/boost_1_66_0/boost/property_tree/ptree.hpp

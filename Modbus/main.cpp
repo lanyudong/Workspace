@@ -13,30 +13,43 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
 
+// SunSpec Model
+// - This model uses boosts property tree to parse the xml models for
+// - modbus register blocks.
+// - https://www.technical-recipes.com/2014/using-boostproperty_tree/
 class SunSpecModel {
 public:
-    SunSpecModel (const unsigned int did, const unsigned int offset)
+    SunSpecModel (unsigned int did, unsigned int offset)
         : offset_(offset) {
         // create filename using a base path, then pad the did number and append
         // to the base path. The sunspec models are provided as xml so that will be
         // the file type that is appended ot the end of the filename.
         std::stringstream ss;
         ss << "./models/smdx/smdx_";
-        ss << std::setfill ('0') << std::setw(5) << 102;
+        ss << std::setfill ('0') << std::setw(5) << did;
         ss << ".xml";
         std::string filename = ss.str();
 
         // Use boosts xml parser to read file and store as member variable.
         boost::property_tree::xml_parser::read_xml(filename, smdx_);
+        name_ = smdx_.get <std::string> ("sunSpecModels.model.<xmlattr>.name", "");
+        length_ = smdx_.get <unsigned int> ("sunSpecModels.model.<xmlattr>.len", 0);
+        std::cout << "SunSpec Model Found"
+            << "\n\tName: " << name_
+            << "\n\tLength: " << length_ << std::endl;
     };
 
     ~SunSpecModel () {};
 
+    std::string GetName () {
+        return name_;
+    };
 
 private:
-    boost::property_tree::ptree smdx_;
     unsigned int offset_;
     unsigned int length_;
+    std::string name_;
+    boost::property_tree::ptree smdx_;
     std::map <std::string, std::string> points_;
 };
 
@@ -51,59 +64,90 @@ public:
         }
     };
 
-    ~Modbus () {};
+    ~Modbus () {
+        models_.clear ();
+        modbus_close(context_ptr_);
+        modbus_free(context_ptr_);
+    };
 
-    void ReadBlock (std::string name);
-    void WriteBlock (std::string name);
+    // Querry
+    // - Read all available registers to find sunspec compliant blocks.
+    // - The first step is to read the first register and see if the modbus
+    // - device is a sunspec complient device.
+    // - Then traverse register array and find sunspec DID values and create a
+    // - sunspec model.
+    void Querry () {
+        unsigned int sunspec_key_ = 1850954613;
+        uint16_t sunspec_id[2];
+        // TODO (TS): sunspec states the holding register start can be
+        // - 30, 40, or 50,000.
+        // - 40000 is the preferece starting location
+        unsigned int id_offset = 0;
+        ReadRegisters(id_offset, 2, sunspec_id);
+        std::cout << MODBUS_GET_INT32_FROM_INT16(sunspec_id,0) << std::endl;
+        std::shared_ptr <SunSpecModel> model (new SunSpecModel (1, 2));
+        models_.push_back (std::move (model));
+    };
+
+    // Read Registers
+    // - the register array is passed to the function as a pointer so the
+    // - modbus method call can operate on them.
+    void ReadRegisters (unsigned int offset,
+                        unsigned int length,
+                        uint16_t *reg_ptr) {
+        int status = modbus_read_registers (context_ptr_,
+                                            offset,
+                                            length,
+                                            reg_ptr);
+        if (status == -1) {
+            std::cout << "[ERROR] : " << modbus_strerror(errno) << '\n';
+        }
+    };
+
+    // Write Registers
+    // - the registers to write are passed by reference to reduce memory
+    void WriteRegisters (unsigned int offset,
+                         unsigned int length,
+                         const uint16_t *reg_ptr) {
+        int status = modbus_write_registers (context_ptr_,
+                                             offset,
+                                             length,
+                                             reg_ptr);
+        if (status == -1) {
+            std::cout << "[ERROR] : " << modbus_strerror(errno) << '\n';
+        }
+    };
+
+    void ReadBlock (std::string name) {
+    };
+
+    void WriteBlock (std::string name) {
+    };
 
 private:
     // utility methods
-    void BlockToModel () {};
-    void ModelToBlock () {};
-    void ScaleModel () {};
+
+private:
+    // member variables
     modbus_t *context_ptr_;
     std::vector <std::shared_ptr <SunSpecModel>> models_;
 };
 
 using namespace std;
 
-int main()
-{
-    modbus_t *mb;
-    uint16_t tab_reg[10];
-    unsigned int tab_max = sizeof(tab_reg);
-    cout << tab_max << endl;
+int main () {
+    Modbus mb ("127.0.0.1", 5020);
+    mb.Querry();
+    uint16_t block[10];
+    mb.ReadRegisters(0,10,block);
 
-    const char *addr = "127.0.0.1";
-    mb = modbus_new_tcp(addr, 5020);
-
-    int dec[] = {18533,27756,28448,22383,29292,100};
-    for (auto &each : dec) {
-        cout << static_cast<char*>(static_cast<void*>(&each));
-    }
-    cout << endl;
-
-    if (modbus_connect(mb) == -1) {
-        cout << "[ERROR] : " << modbus_strerror(errno) << '\n';
-    }
-
-    /* Read 5 registers from the address 0 */
-    if (modbus_read_registers(mb, 0, 5, tab_reg) == -1) {
-        cout << "[ERROR] : " << modbus_strerror(errno) << '\n';
-    }
-
-    for (unsigned int i = 0; i < tab_max; i++)  {
-        tab_reg[i] = i;
-    }
-
-    if (modbus_write_registers(mb, 5, tab_max, tab_reg) == -1) {
-        cout << "[ERROR] : " << modbus_strerror(errno) << '\n';
-    }
-
-    for (auto &reg : tab_reg) {
+    for (auto &reg : block) {
         cout << reg << '\n';
     }
 
-    modbus_close(mb);
-    modbus_free(mb);
+    int dec[6] = {18533,27756,28448,22383,29292,100};
+    for (auto &each : dec) {
+        cout << static_cast<char*>(static_cast<void*>(&each));
+    }
+    return 0;
 }
