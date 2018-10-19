@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1539977701 source:/home/bess/dev/Workspace/SunSpec/src/main.cpp
+	<iostream>
+	"include/SunSpecModel.h"
+
+1539978313 /home/bess/dev/Workspace/SunSpec/src/include/SunSpecModel.h
+	<string>
+	<map>
+	<boost/property_tree/ptree.hpp>
+	<boost/property_tree/xml_parser.hpp>
+	<boost/foreach.hpp>
+
+1539978165 source:/home/bess/dev/Workspace/SunSpec/src/SunSpecModel.cpp
+	"include/SunSpecModel.h"
+
