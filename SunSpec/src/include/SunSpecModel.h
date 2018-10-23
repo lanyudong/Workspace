@@ -2,6 +2,7 @@
 #define SUNSPECMODEL_H
 
 #include <string>
+#include <vector>
 #include <map>
 
 // BOOST Libs
@@ -18,17 +19,46 @@ public:
     SunSpecModel (unsigned int did, unsigned int offset);
     virtual ~SunSpecModel ();
 
+public:
+    std::map <std::string, std::string> BlockToPoints (
+        const std::vector <uint16_t>& register_block
+    );
+
+    std::vector <uint16_t> PointsToBlock (
+        std::map <std::string, std::string>& points
+    );
+
     // this operator will be used when looking for specific models
-    bool operator == (const std::string &name) {
-        return name_ == name;
+    bool operator == (const unsigned int& did) {
+        return did_ == did;
     };
 
-private:
+public:
+    // utility methods
+    void GetScalers ();
+    void DescalePoints (std::map <std::string, std::string>* points);
+
+    // converter registers to larger values
+    uint32_t GetUINT32 (const std::vector <uint16_t>& block,
+                        const unsigned int index);
+    uint64_t GetUINT64 (const std::vector <uint16_t>& block,
+                        const unsigned int index);
+    std::string GetString (const std::vector <uint16_t>& block,
+                           const unsigned int index,
+                           const unsigned int length);
+    void SetUINT32 (std::vector <uint16_t>* block,
+                    const unsigned int index,
+                    const uint32_t value);
+    void SetUINT64 (std::vector <uint16_t>* block,
+                    const unsigned int index,
+                    const uint64_t value);
+
+public:
     unsigned int offset_;
     unsigned int length_;
-    std::string name_;
+    unsigned int did_;
     boost::property_tree::ptree smdx_;
-    std::map <std::string, std::string> points_;
+    std::map <std::string, uint16_t> scalers_;
 };
 
 #endif // SUNSPECMODEL_H
