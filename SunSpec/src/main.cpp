@@ -14,11 +14,17 @@ int main()
     cout << match << endl;
 
     map <string, string> props;
-    vector <uint16_t> register_block (1000,1);
+    vector <uint16_t> register_block (100,3);
     props = model.BlockToPoints(register_block);
-    model.GetScalers();
+
+/*
     for (auto &cell : model.scalers_) {
         cout << cell.first << " : " << cell.second << std::endl;
     }
+
+    for (auto &cell : props) {
+        cout << cell.first << " : " << cell.second << std::endl;
+    }
+*/
     return 0;
 }

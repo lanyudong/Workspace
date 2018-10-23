@@ -19,28 +19,115 @@ SunSpecModel::SunSpecModel (unsigned int did, unsigned int offset)
     std::string name;
     name = smdx_.get <std::string> ("sunSpecModels.model.<xmlattr>.name", "");
     length_ = smdx_.get <unsigned int> ("sunSpecModels.model.<xmlattr>.len", 0);
+
     std::cout << "SunSpec Model Found"
         << "\n\tDID: " << did_
         << "\n\tName: " << name
         << "\n\tLength: " << length_ << std::endl;
+
+    SunSpecModel::GetScalers ();
 }
 
 SunSpecModel::~SunSpecModel() {
 };
+
 
 // Block To Points
 // - convert raw modbus register block to it's corresponding SunSpec points
 std::map <std::string, std::string> SunSpecModel::BlockToPoints (
     const std::vector <uint16_t>& register_block) {
     std::map <std::string, std::string> point_map;
+    std::string id, type, scaler;
+    unsigned int offset;
+
      // Traverse property tree
     BOOST_FOREACH (boost::property_tree::ptree::value_type const& node,
                    smdx_.get_child ("sunSpecModels.model.block")) {
         boost::property_tree::ptree subtree = node.second;
         if( node.first == "point" ) {
+            id = subtree.get <std::string> ("<xmlattr>.id", "");
+            type = subtree.get <std::string> ("<xmlattr>.type", "");
+            scaler = subtree.get <std::string> ("<xmlattr>.sf", "default");
+            offset = subtree.get <unsigned int> ("<xmlattr>.offset", 0);
 
-            if (subtree.get <std::string> ("<xmlattr>.type") == "") {
+            // TODO (TS): this should be configured by the smdx file
+            if (type == "int16") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "uint16") {
+                uint16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "count") {
+                uint16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "acc16") {
+                uint16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "int32") {
+                int32_t value = SunSpecModel::GetUINT32(register_block,offset);
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "float32") {
+                float value = SunSpecModel::GetUINT32(register_block,offset);
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "acc32") {
+                uint32_t value = SunSpecModel::GetUINT32(register_block,offset);
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "enum16") {
+                BOOST_FOREACH (boost::property_tree::ptree::value_type const& subsubtree,
+                               subtree) {
+                    boost::property_tree::ptree symbol = subsubtree.second;
+                    std::string id;
+                    unsigned int offset;
+                    uint16_t property =
+                    if( subsubtree.first == "symbol" && symbol.data() == "3") {
+                        std::string symb;
+                        symb = symbol.get <std::string> ("<xmlattr>.id", "");
+                        std::cout << symbol.data() << " : " << symb << std::endl;
+                    }
+                }
 
+                uint16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "enum32") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "bitfield16") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "bitfield32") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "string") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "pad") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "ipaddr") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "ipv6addr") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
+            } else if (type == "eui48") {
+                int16_t value = register_block[offset];
+                value = value * register_block[scalers_[scaler]];
+                point_map[id] = std::to_string(value);
             }
         }
     }
@@ -50,6 +137,7 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
 
 
 void SunSpecModel::GetScalers() {
+    scalers_["default"] = 1;
      // Traverse property tree
     BOOST_FOREACH (boost::property_tree::ptree::value_type const& node,
                    smdx_.get_child ("sunSpecModels.model.block")) {
