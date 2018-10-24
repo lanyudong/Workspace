@@ -58,7 +58,7 @@ public:
     unsigned int length_;
     unsigned int did_;
     boost::property_tree::ptree smdx_;
-    std::map <std::string, uint16_t> scalers_;
+    std::map <std::string, int16_t> scalers_;
 };
 
 #endif // SUNSPECMODEL_H

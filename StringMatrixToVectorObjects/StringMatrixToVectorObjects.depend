@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1540400933 source:/home/tylor/dev/Workspace/StringMatrixToVectorObjects/main.cpp
+	<iostream>
+	<string>
+	<vector>
+	"tsu.h"
+
+1539839954 /home/tylor/dev/Workspace/StringMatrixToVectorObjects/tsu.h
+	<iostream>
+	<fstream>
+	<sstream>
+	<string>
+	<vector>
+	<regex>
+	<ctime>
+

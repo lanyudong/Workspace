@@ -33,5 +33,9 @@ int main()
         cout << "Time:\t" << entry.time << "\t" << entry.control << " at "
              << entry.setting << '\n';
     }
+
+    string test = "10.0000";
+    float val = stof(test);
+    cout << val << endl;
     return 0;
 }
