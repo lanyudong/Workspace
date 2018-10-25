@@ -44,6 +44,7 @@
 			<Add option="-lmodbus" />
 			<Add directory="/usr/local/lib" />
 		</Linker>
+		<Unit filename="include/Modbus.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="models/smdx/CHANGELOG" />
 		<Unit filename="models/smdx/Makefile" />
@@ -143,6 +144,7 @@
 		<Unit filename="models/smdx/smdx_64110.xml" />
 		<Unit filename="models/smdx/smdx_64111.xml" />
 		<Unit filename="models/smdx/smdx_64112.xml" />
+		<Unit filename="src/Modbus.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
