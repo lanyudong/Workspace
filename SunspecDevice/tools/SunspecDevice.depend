@@ -1,26 +1,13 @@
 # depslib dependency file v1.0
-1539977701 source:/home/bess/dev/Workspace/SunSpec/src/main.cpp
-	<iostream>
-	"include/SunSpecModel.h"
-
-1539978313 /home/bess/dev/Workspace/SunSpec/src/include/SunSpecModel.h
-	<string>
-	<map>
-	<boost/property_tree/ptree.hpp>
-	<boost/property_tree/xml_parser.hpp>
-	<boost/foreach.hpp>
-
-1539978165 source:/home/bess/dev/Workspace/SunSpec/src/SunSpecModel.cpp
-	"include/SunSpecModel.h"
-
-1540401823 source:/home/tylor/dev/Workspace/SunSpec/src/main.cpp
+1540578694 source:/home/tylor/dev/Workspace/SunspecDevice/build/src/main.cpp
 	<iostream>
 	<vector>
 	<string>
 	<map>
+	<bitset>
 	"include/SunSpecModel.h"
 
-1540397662 /home/tylor/dev/Workspace/SunSpec/src/include/SunSpecModel.h
+1540570661 /home/tylor/dev/Workspace/SunspecDevice/build/src/include/SunSpecModel.h
 	<string>
 	<vector>
 	<map>
@@ -5416,8 +5403,10 @@
 1513209409 /home/tylor/src/boost_1_66_0/boost/aligned_storage.hpp
 	<boost/type_traits/aligned_storage.hpp>
 
-1540402197 source:/home/tylor/dev/Workspace/SunSpec/src/SunSpecModel.cpp
+1540583783 source:/home/tylor/dev/Workspace/SunspecDevice/build/src/SunSpecModel.cpp
 	<iostream>
 	<cmath>
+	<cctype>
+	<bitset>
 	"include/SunSpecModel.h"
 

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../include/Modbus.h"
+#include "include/Modbus.h"
 
 Modbus::Modbus (std::string ip, unsigned int port) {
     // create modbus context pointer and connect to device at

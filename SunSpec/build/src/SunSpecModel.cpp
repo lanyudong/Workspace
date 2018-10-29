@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cmath>
+#include <cctype>  // isdigit
+#include <bitset>
 
 #include "include/SunSpecModel.h"
 
@@ -11,10 +13,11 @@ SunSpecModel::SunSpecModel (unsigned int did, unsigned int offset)
     // to the base path. The sunspec models are provided as xml so that will be
     // the file type that is appended ot the end of the filename.
     std::stringstream ss;
-    ss << "./models/smdx/smdx_";
+    ss << "/home/tylor/dev/Workspace/SunSpec/data/models/smdx/smdx_";
     ss << std::setfill ('0') << std::setw(5) << did;
     ss << ".xml";
     std::string filename = ss.str();
+    std::cout << filename << std::endl;
 
     // Use boosts xml parser to read file and store as member variable.
     pt::xml_parser::read_xml(filename, smdx_);
@@ -58,51 +61,44 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
             // - pow() function to raise 10 to the scale value for scaling.
             if (type == "int16") {
                 float value = register_block[offset];
-                unsigned int scale = std::pow(
-                    10, register_block[scalers_[scaler]]
-                );
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value * scale;
                 point_map[id] = std::to_string(value);
             } else if (type == "uint16") {
                 float value = register_block[offset];
-                unsigned int scale = std::pow(
-                    10, register_block[scalers_[scaler]]
-                );
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value * scale;
                 point_map[id] = std::to_string(value);
             } else if (type == "count") {
                 float value = register_block[offset];
-                unsigned int scale = std::pow(
-                    10, register_block[scalers_[scaler]]
-                );
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value * scale;
                 point_map[id] = std::to_string(value);
             } else if (type == "acc16") {
                 float value = register_block[offset];
-                unsigned int scale = std::pow(
-                    10, register_block[scalers_[scaler]]
-                );
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value * scale;
                 point_map[id] = std::to_string(value);
             } else if (type == "int32") {
                 float value = SunSpecModel::GetUINT32(register_block,offset);
-                unsigned int scale = std::pow(
-                    10, register_block[scalers_[scaler]]
-                );
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value * scale;
                 point_map[id] = std::to_string(value);
             } else if (type == "float32") {
                 float value = SunSpecModel::GetUINT32(register_block,offset);
-                unsigned int scale = std::pow(
-                    10, register_block[scalers_[scaler]]
-                );
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value * scale;
                 point_map[id] = std::to_string(value);
             } else if (type == "acc32") {
                 float value = SunSpecModel::GetUINT32(register_block,offset);
-                unsigned int scale = std::pow(
-                    10, register_block[scalers_[scaler]]
-                );
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value * scale;
                 point_map[id] = std::to_string(value);
             } else if (type == "enum16") {
@@ -130,28 +126,60 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                     }
                 }
             } else if (type == "bitfield16") {
+                std::vector <std::string> symbols;
+                std::string sym;
+
+                // collect each bits symbol value
                 BOOST_FOREACH (pt::ptree::value_type const& subsubtree,
                                subtree) {
                     pt::ptree symbol = subsubtree.second;
-                    std::string reg = std::to_string(register_block[offset]);
-                    if( subsubtree.first == "symbol" && symbol.data() == reg) {
-                        std::string sym;
+                    if( subsubtree.first == "symbol") {
                         sym = symbol.get <std::string> ("<xmlattr>.id", "");
-                        point_map[id] = sym;
+                        symbols.push_back(sym);
                     }
                 }
+
+                if (!symbols.empty()) {
+                    sym.clear();
+
+                    // for each bit add symbol if it is set;
+                    std::bitset<16> bits (register_block[offset]);
+                    for (unsigned int i = 0; i < symbols.size(); i++) {
+                        if (bits[i]) {
+                            sym = sym + symbols[i] + ",";
+                        }
+                    }
+                    sym.pop_back ();  // remove last comma
+                    point_map[id] = sym;
+                }
             } else if (type == "bitfield32") {
+                std::vector <std::string> symbols;
+                std::string sym;
+
+                // collect each bits symbol value
                 BOOST_FOREACH (pt::ptree::value_type const& subsubtree,
                                subtree) {
                     pt::ptree symbol = subsubtree.second;
-                    std::string reg = std::to_string(
-                        SunSpecModel::GetUINT32(register_block,offset)
-                    );
-                    if( subsubtree.first == "symbol" && symbol.data() == reg) {
-                        std::string sym;
+                    if( subsubtree.first == "symbol") {
                         sym = symbol.get <std::string> ("<xmlattr>.id", "");
-                        point_map[id] = sym;
+                        symbols.push_back(sym);
                     }
+                }
+                if (!symbols.empty()) {
+                    sym.clear();
+
+                    // for each bit add symbol if it is set;
+                    std::bitset<32> bits (
+                        SunSpecModel::GetUINT32(register_block, offset)
+                    );
+
+                    for (unsigned int i = 0; i < symbols.size(); i++) {
+                        if (bits[i]) {
+                            sym = sym + symbols[i] + ",";
+                        }
+                    }
+                    sym.pop_back ();  // remove last comma
+                    point_map[id] = sym;
                 }
             } else if (type == "sunssf") {
                 int16_t value = register_block[offset];
@@ -200,40 +228,40 @@ std::vector <uint16_t> SunSpecModel::PointsToBlock (
             // TODO (TS): this should be configured by the smdx file
             if (type == "int16") {
                 float value = std::stof(points[id]);
-                float scale = std::stof(points[scaler]);
-                scale = std::pow(10, scale);
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 register_block[offset] = value / scale;
             } else if (type == "uint16") {
                 float value = std::stof(points[id]);
-                float scale = std::stof(points[scaler]);
-                scale = std::pow(10, scale);
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 register_block[offset] = value / scale;
             } else if (type == "count") {
                 float value = std::stof(points[id]);
-                float scale = std::stof(points[scaler]);
-                scale = std::pow(10, scale);
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 register_block[offset] = value / scale;
             } else if (type == "acc16") {
                 float value = std::stof(points[id]);
-                float scale = std::stof(points[scaler]);
-                scale = std::pow(10, scale);
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 register_block[offset] = value / scale;
             } else if (type == "int32") {
                 float value = std::stof(points[id]);
-                float scale = std::stof(points[scaler]);
-                scale = std::pow(10, scale);
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value / scale;
                 SunSpecModel::SetUINT32(&register_block,offset, value);
             } else if (type == "float32") {
                 float value = std::stof(points[id]);
-                float scale = std::stof(points[scaler]);
-                scale = std::pow(10, scale);
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value / scale;
                 SunSpecModel::SetUINT32(&register_block,offset, value);
             } else if (type == "acc32") {
                 float value = std::stof(points[id]);
-                float scale = std::stof(points[scaler]);
-                scale = std::pow(10, scale);
+                float scale = SunSpecModel::BlockToScaler(register_block,
+                                                          scaler);
                 value = value / scale;
                 SunSpecModel::SetUINT32(&register_block,offset, value);
             } else if (type == "enum16") {
@@ -278,6 +306,30 @@ void SunSpecModel::GetScalers() {
                 scalers_[id] = offset;
             }
         }
+    }
+};
+
+// Block To Scaler
+// - this function is just a hack to get non-sunspec complient devices to be
+// - interpreted.
+float SunSpecModel::BlockToScaler (const std::vector <uint16_t>& register_block,
+                                   std::string scaler) {
+    if (std::isdigit (*scaler.c_str())) {
+        return std::stof(scaler);
+    } else {
+        return std::pow(10, register_block[scalers_[scaler]]);
+    }
+};
+
+// Point To Scaler
+// - this function is just a hack to get non-sunspec complient devices to be
+// - interpreted.
+float SunSpecModel::PointToScaler (std::map <std::string, std::string>& points,
+                                   std::string scaler) {
+    if (std::isdigit (*scaler.c_str())) {
+        return std::stof(scaler);
+    } else {
+        return std::stof(points[scaler]);
     }
 };
 

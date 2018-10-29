@@ -1,49 +1,33 @@
 # depslib dependency file v1.0
-1539900399 source:/home/bess/dev/Workspace/Modbus/main.cpp
+1539977701 source:/home/bess/dev/Workspace/SunSpec/src/main.cpp
 	<iostream>
-	<iomanip>
-	<sstream>
-	<vector>
+	"include/SunSpecModel.h"
+
+1539978313 /home/bess/dev/Workspace/SunSpec/src/include/SunSpecModel.h
 	<string>
 	<map>
-	<modbus/modbus-tcp.h>
 	<boost/property_tree/ptree.hpp>
 	<boost/property_tree/xml_parser.hpp>
 	<boost/foreach.hpp>
 
-1540051773 source:/home/tylor/dev/Workspace/Modbus/main.cpp
+1539978165 source:/home/bess/dev/Workspace/SunSpec/src/SunSpecModel.cpp
+	"include/SunSpecModel.h"
+
+1540578368 source:/home/tylor/dev/Workspace/SunSpec/src/main.cpp
 	<iostream>
-	<iomanip>
-	<sstream>
 	<vector>
 	<string>
 	<map>
-	"include/Modbus.h"
+	<bitset>
+	"include/SunSpecModel.h"
 
-1539798558 source:/home/tylor/dev/Workspace/Modbus/src/Modbus.cpp
-	"Modbus.h"
-
-1540831564 /home/tylor/dev/Workspace/Modbus/include/Modbus.h
+1540570661 /home/tylor/dev/Workspace/SunSpec/src/include/SunSpecModel.h
 	<string>
 	<vector>
-	<modbus/modbus-tcp.h>
-
-1540829436 /usr/local/include/modbus/modbus-tcp.h
-	"modbus.h"
-	<winsock2.h>
-
-1540829436 /usr/local/include/modbus/modbus.h
-	<sys/param.h>
-	<stdint.h>
-	"stdint.h"
-	"modbus-version.h"
-	"modbus-tcp.h"
-	"modbus-rtu.h"
-
-1540829436 /usr/local/include/modbus/modbus-version.h
-
-1540829436 /usr/local/include/modbus/modbus-rtu.h
-	"modbus.h"
+	<map>
+	<boost/property_tree/ptree.hpp>
+	<boost/property_tree/xml_parser.hpp>
+	<boost/foreach.hpp>
 
 1513209407 /home/tylor/src/boost_1_66_0/boost/property_tree/ptree.hpp
 	<boost/property_tree/ptree_fwd.hpp>
@@ -5432,4 +5416,27 @@
 
 1513209409 /home/tylor/src/boost_1_66_0/boost/aligned_storage.hpp
 	<boost/type_traits/aligned_storage.hpp>
+
+1540578648 source:/home/tylor/dev/Workspace/SunSpec/src/SunSpecModel.cpp
+	<iostream>
+	<cmath>
+	<cctype>
+	<bitset>
+	"include/SunSpecModel.h"
+
+1540578694 source:/home/tylor/dev/Workspace/SunSpec/build/src/main.cpp
+	<iostream>
+	<vector>
+	<string>
+	<map>
+	<bitset>
+	"include/SunSpecModel.h"
+
+1540570661 /home/tylor/dev/Workspace/SunSpec/build/src/include/SunSpecModel.h
+	<string>
+	<vector>
+	<map>
+	<boost/property_tree/ptree.hpp>
+	<boost/property_tree/xml_parser.hpp>
+	<boost/foreach.hpp>
 

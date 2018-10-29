@@ -36,6 +36,17 @@ public:
 public:
     // utility methods
     void GetScalers ();
+
+    float BlockToScaler (
+        const std::vector <uint16_t>& register_block,
+        std::string scaler
+    );
+
+    float PointToScaler (
+        std::map <std::string, std::string>& points,
+        std::string scaler
+    );
+
     void DescalePoints (std::map <std::string, std::string>* points);
 
     // converter registers to larger values

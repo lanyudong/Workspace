@@ -1,5 +1,5 @@
-#ifndef MODBUS_H_
-#define MODBUS_H_
+#ifndef MODBUS_H
+#define MODBUS_H
 
 #include <string>
 #include <vector>
@@ -24,8 +24,7 @@ public:
     void WriteBlock (std::string name);
 
 private:
-    modbus_t* context_ptr_;
-    std::vector<std
+
 };
 
-#endif // MODBUS_H_
+#endif // MODBUS_H
