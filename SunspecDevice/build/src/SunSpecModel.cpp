@@ -7,29 +7,21 @@
 
 namespace pt = boost::property_tree;
 
-SunSpecModel::SunSpecModel (unsigned int did, unsigned int offset)
-    : offset_(offset) {
-    // create filename using a base path, then pad the did number and append
-    // to the base path. The sunspec models are provided as xml so that will be
-    // the file type that is appended ot the end of the filename.
-    std::stringstream ss;
-    ss << "/home/tylor/dev/Workspace/SunSpec/data/models/smdx/smdx_";
-    ss << std::setfill ('0') << std::setw(5) << did;
-    ss << ".xml";
-    std::string filename = ss.str();
-    std::cout << filename << std::endl;
-
+SunSpecModel::SunSpecModel (unsigned int did,
+                            unsigned int offset,
+                            std::string model_path)
+    : offset_(offset+2) {
     // Use boosts xml parser to read file and store as member variable.
-    pt::xml_parser::read_xml(filename, smdx_);
+    pt::xml_parser::read_xml(model_path, smdx_);
     did_ = smdx_.get <unsigned int> ("sunSpecModels.model.<xmlattr>.id", 0);
     std::string name;
     name = smdx_.get <std::string> ("sunSpecModels.model.<xmlattr>.name", "");
     length_ = smdx_.get <unsigned int> ("sunSpecModels.model.<xmlattr>.len", 0);
 
-    std::cout << "SunSpec Model Found"
-        << "\n\tDID: " << did_
-        << "\n\tName: " << name
-        << "\n\tLength: " << length_ << std::endl;
+    std::cout << "\tSunSpec Model Found"
+        << "\n\t\tDID: " << did_
+        << "\n\t\tName: " << name
+        << "\n\t\tLength: " << length_ << std::endl;
 
     SunSpecModel::GetScalers ();
 }
@@ -37,6 +29,13 @@ SunSpecModel::SunSpecModel (unsigned int did, unsigned int offset)
 SunSpecModel::~SunSpecModel() {
 };
 
+unsigned int SunSpecModel::GetOffset () {
+    return offset_;
+};
+
+unsigned int SunSpecModel::GetLength () {
+    return length_;
+};
 
 // Block To Points
 // - convert raw modbus register block to it's corresponding SunSpec points
@@ -187,8 +186,8 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
             } else if (type == "string") {
                 unsigned int length;
                 length = subtree.get <unsigned int> ("<xmlattr>.len", 0);
-                std::string value = SunSpecModel::GetString(
-                    register_block,offset, length
+                std::string value = SunSpecModel::GetString (
+                    register_block, offset, length
                 );
                 point_map[id] = value;
             } else if (type == "pad") {
@@ -316,6 +315,8 @@ float SunSpecModel::BlockToScaler (const std::vector <uint16_t>& register_block,
                                    std::string scaler) {
     if (std::isdigit (*scaler.c_str())) {
         return std::stof(scaler);
+    } else if (scaler == "default") {
+        return 1;
     } else {
         return std::pow(10, register_block[scalers_[scaler]]);
     }
@@ -343,16 +344,16 @@ uint32_t SunSpecModel::GetUINT32 (const std::vector <uint16_t>& block,
                                   const unsigned int index) {
     // bitshift the first register 16 bits and then append second register
     // this process is dependant on modbus
-    return (block[index] << 16) | block[index];
+    return (block[index+1] << 16) | block[index];
 };
 
 
 uint64_t SunSpecModel::GetUINT64 (const std::vector <uint16_t>& block,
                                   const unsigned int index) {
-    uint64_t value = static_cast<uint64_t>(block[index]) << 48
-                     | static_cast<uint64_t>(block[index+1]) << 32
-                     | static_cast<uint64_t>(block[index+2]) << 16
-                     | block[index+3];
+    uint64_t value = static_cast<uint64_t>(block[index+3]) << 48
+                     | static_cast<uint64_t>(block[index+2]) << 32
+                     | static_cast<uint64_t>(block[index+1]) << 16
+                     | block[index];
     return value;
 };
 
@@ -361,7 +362,7 @@ std::string SunSpecModel::GetString (const std::vector <uint16_t>& block,
                                      const unsigned int index,
                                      const unsigned int length) {
     std::stringstream ss;
-    for (unsigned int i = index; i < length; i++) {
+    for (unsigned int i = index; i < length + index; i++) {
         ss << static_cast <char> (block[i] >> 8);
         ss << static_cast <char> (block[i]);
     }

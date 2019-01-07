@@ -47,9 +47,9 @@
 			<Add option="-lmodbus" />
 			<Add directory="/usr/local/lib" />
 		</Linker>
-		<Unit filename="../build/src/Modbus.cpp" />
+		<Unit filename="../build/src/SunSpecModbus.cpp" />
 		<Unit filename="../build/src/SunSpecModel.cpp" />
-		<Unit filename="../build/src/include/Modbus.h" />
+		<Unit filename="../build/src/include/SunSpecModbus.h" />
 		<Unit filename="../build/src/include/SunSpecModel.h" />
 		<Unit filename="../build/src/main.cpp" />
 		<Unit filename="../data/models/smdx/CHANGELOG" />

@@ -1,13 +1,13 @@
 # depslib dependency file v1.0
-1540578694 source:/home/tylor/dev/Workspace/SunspecDevice/build/src/main.cpp
+1546898675 source:/home/tylor/dev/Workspace/SunspecDevice/build/src/main.cpp
 	<iostream>
 	<vector>
 	<string>
 	<map>
 	<bitset>
-	"include/SunSpecModel.h"
+	"include/SunSpecModbus.h"
 
-1540570661 /home/tylor/dev/Workspace/SunspecDevice/build/src/include/SunSpecModel.h
+1546556769 /home/tylor/dev/Workspace/SunspecDevice/build/src/include/SunSpecModel.h
 	<string>
 	<vector>
 	<map>
@@ -5403,10 +5403,41 @@
 1513209409 /home/tylor/src/boost_1_66_0/boost/aligned_storage.hpp
 	<boost/type_traits/aligned_storage.hpp>
 
-1540583783 source:/home/tylor/dev/Workspace/SunspecDevice/build/src/SunSpecModel.cpp
+1546898731 source:/home/tylor/dev/Workspace/SunspecDevice/build/src/SunSpecModel.cpp
 	<iostream>
 	<cmath>
 	<cctype>
 	<bitset>
 	"include/SunSpecModel.h"
+
+1546556769 /home/tylor/dev/Workspace/SunspecDevice/build/src/include/SunSpecModbus.h
+	<string>
+	<vector>
+	<map>
+	<modbus/modbus-tcp.h>
+	"SunSpecModel.h"
+
+1544130721 /usr/local/include/modbus/modbus-tcp.h
+	"modbus.h"
+	<winsock2.h>
+
+1544130721 /usr/local/include/modbus/modbus.h
+	<sys/param.h>
+	<stdint.h>
+	"stdint.h"
+	"modbus-version.h"
+	"modbus-tcp.h"
+	"modbus-rtu.h"
+
+1544130721 /usr/local/include/modbus/modbus-version.h
+
+1544130721 /usr/local/include/modbus/modbus-rtu.h
+	"modbus.h"
+
+1546899615 source:/home/tylor/dev/Workspace/SunspecDevice/build/src/SunSpecModbus.cpp
+	<iostream>
+	<fstream>
+	<sstream>
+	<sys/stat.h>
+	"include/SunSpecModbus.h"
 
