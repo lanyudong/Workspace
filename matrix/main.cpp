@@ -4,27 +4,25 @@
 #include <vector>
 #include <string>
 
+class Operator {
+    tsu::string_matrix schedule_;
+
+    public:
+        Operator (std::string filename) {
+            char delim = ',';
+            unsigned int cols = 3;
+            schedule_ = tsu::FileToMatrix(filename, delim, cols);
+        };
+
+        void Print () {
+            std::cout << schedule_[0][0] << std::endl;
+        };
+};
+
 using namespace std;
 
 int main()
 {
-    vector <string> test(100, "duhh");
-    vector <vector <string>> matrix (10, vector <string> (10, "old"));
-    unsigned int cnt = 0;
-    for (auto &row : matrix) {
-        for (auto &col : row) {
-            col = test[cnt];
-            cnt++;
-        }
-    }
-
-    for (const auto &row : matrix) {
-        for (const auto &col : row) {
-            cout << col << '\t';
-        }
-        cout << endl;
-    }
-
     tsu::string_matrix str_mat = tsu::FileToMatrix("data.csv", ',', 3);
 
     for (const auto &row : str_mat) {
@@ -33,6 +31,9 @@ int main()
         }
         cout << endl;
     }
+
+    Operator op("data.csv");
+    op.Print();
 
     return 0;
 }

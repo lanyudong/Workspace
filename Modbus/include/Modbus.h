@@ -11,7 +11,6 @@ class Modbus {
 public:
     Modbus (std::string ip, unsigned int port);
     ~Modbus ();
-    void Querry ();
     void ReadRegisters (unsigned int offset,
                         unsigned int length,
                         uint16_t *reg_ptr);
@@ -25,7 +24,6 @@ public:
 
 private:
     modbus_t* context_ptr_;
-    std::vector<std
 };
 
 #endif // MODBUS_H_
