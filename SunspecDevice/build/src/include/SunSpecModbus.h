@@ -9,7 +9,7 @@
 #include "SunSpecModel.h"
 
 // This class uses sunspec models to read/scale/transplate blocks of modbus
-// registers to be used by a controller. 
+// registers to be used by a controller.
 class SunSpecModbus {
 public:
     SunSpecModbus (std::map <std::string, std::string>& configs);
@@ -24,6 +24,9 @@ public:
     std::map <std::string, std::string> ReadBlock (unsigned int did);
 
     void WriteBlock (
+        unsigned int did, std::map <std::string, std::string>& points
+    );
+    void WritePoint (
         unsigned int did, std::map <std::string, std::string>& points
     );
 

@@ -17,12 +17,9 @@ int main()
     configs["ip"]="192.168.0.64";
     configs["port"]="502";
     SunSpecModbus ssmb(configs);
-    map <string, string> props;
-    vector <uint16_t> register_block (100,1);
 
-    props = ssmb.ReadBlock(64110);
-    for (auto &cell : props) {
-        cout << cell.first << " : " << cell.second << std::endl;
-    }
+    map <string, string> point;
+    point["GSconfig_ReFloat_Volts"] = "48";
+    ssmb.WritePoint(64116, point);
     return 0;
 }
