@@ -67,7 +67,7 @@ void SunSpecModbus::Query (unsigned int did) {
                 new SunSpecModel (did_and_length[0], id_offset, filepath)
             );
             models_.push_back (std::move (model));
-            std::map <std::string, std::string> props = SunSpecModbus::ReadBlock(did_and_length[0]);
+            SunSpecModbus::ReadBlock(did_and_length[0]);  // update sunssf
             id_offset += did_and_length[1] + 2; // block length not model length
             SunSpecModbus::ReadRegisters(id_offset, 2, did_and_length);
             filepath = SunSpecModbus::FormatModelPath (did_and_length[0]);
@@ -248,20 +248,20 @@ void SunSpecModbus::WriteBlock (unsigned int did,
 
 // Write Point
 // - using the same format as writing a block, it will pass a string map
-// - to the points to block function and only write the desired register
+// - to the points to register function and only write the desired registers
 void SunSpecModbus::WritePoint (unsigned int did,
-                                std::map <std::string, std::string>& points) {
+                                std::map <std::string, std::string>& point) {
     for (const auto model : models_) {
         if (*model == did) {
             // read register block
-            unsigned int offset = model->GetOffset ();
-            unsigned int length = model->GetLength ();
-            std::vector <uint16_t> block = model->PointsToBlock (points);
+            std::vector <uint16_t> registers = model->PointToRegisters (point);
+            unsigned int offset = registers[0];
+            unsigned int length = registers[1];
+            registers.erase (registers.begin(), registers.begin()+2);
 
-            for (unsigned int i = 0; i < length; i++) {
-                if (block[i] > 0) {
-                    std::cout << offset + i << " : " << block[i] << std::endl;
-                }
+            std::cout << "WritePoint: " << offset << ", " << length << '\n';
+            for (const auto& reg : registers) {
+                std::cout << "\t" << reg << '\n';
             }
             //convert vector to array for writing to modbus registers
             //uint16_t* raw = block.data();

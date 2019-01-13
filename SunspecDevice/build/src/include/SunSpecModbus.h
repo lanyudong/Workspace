@@ -27,7 +27,7 @@ public:
         unsigned int did, std::map <std::string, std::string>& points
     );
     void WritePoint (
-        unsigned int did, std::map <std::string, std::string>& points
+        unsigned int did, std::map <std::string, std::string>& point
     );
 
 private:

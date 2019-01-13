@@ -35,6 +35,10 @@ public:
         std::map <std::string, std::string>& points
     );
 
+    std::vector <uint16_t> PointToRegisters (
+        std::map <std::string, std::string>& points
+    );
+
     // this operator will be used when looking for specific models
     bool operator == (const unsigned int& did) {
         return did_ == did;
@@ -75,6 +79,7 @@ public:
     unsigned int did_;
     boost::property_tree::ptree smdx_;
     std::map <std::string, uint16_t> scalers_;
+    std::map <std::string, float> sunssf_;
 };
 
 #endif // SUNSPECMODEL_H

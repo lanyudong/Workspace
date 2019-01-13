@@ -60,52 +60,80 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
             // - pow() function to raise 10 to the scale value for scaling.
             if (type == "int16") {
                 int16_t value = register_block[offset];
-                float scale = SunSpecModel::BlockToScaler(register_block,
-                                                          scaler);
+                if (sunssf_.count(scaler) == 0){
+                    float scale = SunSpecModel::BlockToScaler(
+                        register_block, scaler
+                    );                    
+                } 
+
                 std::cout << id << ": " << value << " , " << scale << std::endl;
-                value = value * scale;
+                value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "uint16") {
                 float value = register_block[offset];
-                float scale = SunSpecModel::BlockToScaler(register_block,
-                                                          scaler);
+                if (sunssf_.count(scaler) == 0){
+                    float scale = SunSpecModel::BlockToScaler(
+                        register_block, scaler
+                    );                    
+                } 
+
                 std::cout << id << ": " << value << " , " << scale << std::endl;
-                value = value * scale;
+                value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "count") {
                 float value = register_block[offset];
-                float scale = SunSpecModel::BlockToScaler(register_block,
-                                                          scaler);
+                if (sunssf_.count(scaler) == 0){
+                    float scale = SunSpecModel::BlockToScaler(
+                        register_block, scaler
+                    );                    
+                } 
+
                 std::cout << id << ": " << value << " , " << scale << std::endl;
-                value = value * scale;
+                value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "acc16") {
                 float value = register_block[offset];
-                float scale = SunSpecModel::BlockToScaler(register_block,
-                                                          scaler);
+                if (sunssf_.count(scaler) == 0){
+                    float scale = SunSpecModel::BlockToScaler(
+                        register_block, scaler
+                    );                    
+                } 
+
                 std::cout << id << ": " << value << " , " << scale << std::endl;
-                value = value * scale;
+                value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "int32") {
                 int32_t value = SunSpecModel::GetUINT32(register_block,offset);
-                float scale = SunSpecModel::BlockToScaler(register_block,
-                                                          scaler);
+                if (sunssf_.count(scaler) == 0){
+                    float scale = SunSpecModel::BlockToScaler(
+                        register_block, scaler
+                    );                    
+                } 
+
                 std::cout << id << ": " << value << " , " << scale << std::endl;
-                value = value * scale;
+                value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "float32") {
                 float value = SunSpecModel::GetUINT32(register_block,offset);
-                float scale = SunSpecModel::BlockToScaler(register_block,
-                                                          scaler);
+                if (sunssf_.count(scaler) == 0){
+                    float scale = SunSpecModel::BlockToScaler(
+                        register_block, scaler
+                    );                    
+                } 
+
                 std::cout << id << ": " << value << " , " << scale << std::endl;
-                value = value * scale;
+                value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "acc32") {
                 float value = SunSpecModel::GetUINT32(register_block,offset);
-                float scale = SunSpecModel::BlockToScaler(register_block,
-                                                          scaler);
+                if (sunssf_.count(scaler) == 0){
+                    float scale = SunSpecModel::BlockToScaler(
+                        register_block, scaler
+                    );                    
+                } 
+
                 std::cout << id << ": " << value << " , " << scale << std::endl;
-                value = value * scale;
+                value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "enum16") {
                 std::string reg = std::to_string(register_block[offset]);
@@ -245,6 +273,8 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
 
 // Points To Block
 // - translated sunspec points into register block for writing to device
+// - TODO (TS): due to issues with Outback's AXS port this function will not
+// -    will not be used. Instead use PointToRegisters
 std::vector <uint16_t> SunSpecModel::PointsToBlock (
     std::map <std::string, std::string>& points) {
     std::vector <uint16_t> register_block (length_, 0);  // initialize block
@@ -329,6 +359,120 @@ std::vector <uint16_t> SunSpecModel::PointsToBlock (
     return register_block;
 };
 
+// Point To Registers
+// - converter point to registers for writing to modbus device. Since some
+// - points will span multiple registers the first two values will hold the
+// - offset/length of the registers to be written to.
+std::vector <uint16_t> SunSpecModel::PointToRegisters (
+    std::map <std::string, std::string>& point) {
+    std::string id, type, scaler;
+    unsigned int offset;
+
+     // Traverse property tree
+    BOOST_FOREACH (pt::ptree::value_type const& node,
+                   smdx_.get_child ("sunSpecModels.model.block")) {
+        pt::ptree subtree = node.second;
+        if( node.first == "point" ) {
+            id = subtree.get <std::string> ("<xmlattr>.id", "");
+
+            // skip other type checks if id does not match point
+            if (point.count(id) == 0) {
+                continue;
+            }
+
+            type = subtree.get <std::string> ("<xmlattr>.type", "");
+            scaler = subtree.get <std::string> ("<xmlattr>.sf", "default");
+            offset = subtree.get <unsigned int> ("<xmlattr>.offset", 0);
+
+            // TODO (TS): this should be configured by the smdx file
+            if (type == "int16") {
+                int16_t value = std::stoi(points[id]);
+                value = value / sunssf_[scaler];
+                std::vector <uint16_t> registers (
+                    3, 
+                    {offset_ + offset, 1, value}
+                );
+                std::cout << id << ": " << value << std::endl;
+                return registers;
+            } else if (type == "uint16") {
+                uint16_t value = std::stoul(points[id]);
+                value = value / sunssf_[scaler];
+                std::vector <uint16_t> registers (
+                    3, 
+                    {offset_ + offset, 1, value}
+                );
+                std::cout << id << ": " << value << std::endl;
+                return registers;
+            } else if (type == "count") {
+                uint16_t value = std::stoul(points[id]);
+                value = value / sunssf_[scaler];
+                std::vector <uint16_t> registers (
+                    3, 
+                    {offset_ + offset, 1, value}
+                );
+                std::cout << id << ": " << value << std::endl;
+                return registers;
+            } else if (type == "acc16") {
+                uint16_t value = std::stoul(points[id]);
+                value = value / sunssf_[scaler];
+                std::vector <uint16_t> registers (
+                    3, 
+                    {offset_ + offset, 1, value}
+                );
+                std::cout << id << ": " << value << std::endl;
+                return registers;
+            } else if (type == "int32") {
+                int value = std::stoi(points[id]);
+                value = value / sunssf_[scaler];
+                std::vector <uint16_t> registers (
+                    3, 
+                    {offset_ + offset, 2, 0, 0}
+                );
+                SunSpecModel::SetUINT32(&registers, 2, value);
+                std::cout << id << ": " << value << std::endl;
+                return registers;
+            } else if (type == "float32") {
+                unsigned int value = std::stoul(points[id]);
+                value = value / sunssf_[scaler];
+                std::vector <uint16_t> registers (
+                    3, 
+                    {offset_ + offset, 2, 0, 0}
+                );
+                SunSpecModel::SetUINT32(&registers, 2, value);
+                std::cout << id << ": " << value << std::endl;
+                return registers;
+            } else if (type == "acc32") {
+                unsigned int value = std::stoul(points[id]);
+                value = value / sunssf_[scaler];
+                std::vector <uint16_t> registers (
+                    3, 
+                    {offset_ + offset, 2, 0, 0}
+                );
+                SunSpecModel::SetUINT32(&registers, 2, value);
+                std::cout << id << ": " << value << std::endl;
+                return registers;
+            } else if (type == "enum16") {
+                //TODO (TS): I don't believe these values can be written to
+            } else if (type == "enum32") {
+                //TODO (TS): I don't believe these values can be written to
+            } else if (type == "bitfield16") {
+                //TODO (TS): I don't believe these values can be written to
+            } else if (type == "bitfield32") {
+                //TODO (TS): I don't believe these values can be written to
+            } else if (type == "string") {
+                //TODO (TS): I don't believe these values can be written to
+            } else if (type == "pad") {
+                //TODO (TS): I don't believe these values can be written to
+            } else if (type == "ipaddr") {
+                //TODO (TS): determine how this value is implemented.
+            } else if (type == "ipv6addr") {
+                //TODO (TS): determine how this value is implemented.
+            } else if (type == "eui48") {
+                //TODO (TS): determine how this value is implemented.
+            }
+        }
+    }
+};
 
 void SunSpecModel::GetScalers() {
     scalers_["default"] = 0;
