@@ -159,44 +159,10 @@ void SunSpecModbus::ReadRegisters (unsigned int offset,
 void SunSpecModbus::WriteRegisters (unsigned int offset,
                                     unsigned int length,
                                     const uint16_t *reg_ptr) {
-    // convert raw registers to vector to pass to other functions
-    std::vector <uint16_t> block (reg_ptr, reg_ptr + length);
-    unsigned int new_offset = offset;
-    int status;
-    int ctr = 1;
-    int max_len = 50;
-    while (ctr*max_len < length) {
-        uint16_t temp_reg[max_len];
-        std::cout << "HERE" << std::endl;
-        // copy register block vector into the register array
-        memcpy(temp_reg, &block.front () + ctr*max_len, max_len * sizeof (uint16_t));
-        status = modbus_write_registers (context_ptr_,
-                                         new_offset,
-                                         max_len,
-                                         temp_reg);
-        if (status == -1) {
-            std::cout << "[ERROR]\t"
-                << "Write Registers: " << modbus_strerror(errno) << '\n';
-            status = modbus_flush(context_ptr_);
-            if (status == -1) {
-                std::cout << "[ERROR]\t"
-                    << "Modbus Flush: " << modbus_strerror(errno) << '\n';
-                modbus_flush(context_ptr_);
-            }
-        }
+    int status = modbus_write_registers (
+        context_ptr_, offset, length, reg_ptr
+    );
 
-        new_offset += max_len;
-        ctr++;
-    }
-
-    unsigned int reg_left = length - ctr*max_len;
-    uint16_t temp_reg[reg_left];
-    // copy register block vector into the register array
-    memcpy(temp_reg, &block.front () + ctr*max_len, reg_left * sizeof (uint16_t));
-    status = modbus_write_registers (context_ptr_,
-                                     new_offset,
-                                     reg_left,
-                                     temp_reg);
     if (status == -1) {
         std::cout << "[ERROR]\t"
             << "Write Registers: " << modbus_strerror(errno) << '\n';
@@ -264,9 +230,8 @@ void SunSpecModbus::WritePoint (unsigned int did,
                 std::cout << "\t" << reg << '\n';
             }
             //convert vector to array for writing to modbus registers
-            //uint16_t* raw = block.data();
-            //SunSpecModbus::WriteRegisters(offset, length, raw);
-            //return;
+            uint16_t* raw = registers.data();
+            SunSpecModbus::WriteRegisters(offset, length, raw);
             return;
         }
     }
@@ -282,4 +247,10 @@ std::string SunSpecModbus::FormatModelPath (unsigned int did) {
     ss << std::setfill ('0') << std::setw(5) << did;
     ss << ".xml";
     return ss.str();
+}
+
+void SunSpecModbus::PrintBlock (std::map <std::string, std::string>& block) {
+    for (const auto& reg : block) {
+        std::cout << reg.first << " : " << reg.second << std::endl;
+    }
 }

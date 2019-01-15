@@ -19,7 +19,9 @@ int main()
     SunSpecModbus ssmb(configs);
 
     map <string, string> point;
-    point["GSconfig_ReFloat_Volts"] = "48";
+    point["GSconfig_ReFloat_Volts"] = "50";
     ssmb.WritePoint(64116, point);
+    point = ssmb.ReadBlock(64116);
+    ssmb.PrintBlock(point);
     return 0;
 }

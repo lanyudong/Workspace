@@ -30,6 +30,10 @@ public:
         unsigned int did, std::map <std::string, std::string>& point
     );
 
+    void PrintBlock (
+        std::map <std::string, std::string>& block
+    );
+
 private:
     modbus_t* context_ptr_;
     std::string model_path_;

@@ -63,43 +63,44 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                 if (sunssf_.count(scaler) == 0){
                     float scale = SunSpecModel::BlockToScaler(
                         register_block, scaler
-                    );                    
-                } 
+                    );
+                    sunssf_[scaler] = scale;
+                }
 
-                std::cout << id << ": " << value << " , " << scale << std::endl;
                 value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "uint16") {
-                float value = register_block[offset];
+                uint16_t value = register_block[offset];
                 if (sunssf_.count(scaler) == 0){
                     float scale = SunSpecModel::BlockToScaler(
                         register_block, scaler
-                    );                    
-                } 
+                    );
+                    sunssf_[scaler] = scale;
+                }
 
-                std::cout << id << ": " << value << " , " << scale << std::endl;
                 value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "count") {
-                float value = register_block[offset];
+                uint16_t value = register_block[offset];
                 if (sunssf_.count(scaler) == 0){
                     float scale = SunSpecModel::BlockToScaler(
                         register_block, scaler
-                    );                    
-                } 
+                    );
+                    sunssf_[scaler] = scale;
+                }
 
-                std::cout << id << ": " << value << " , " << scale << std::endl;
+                std::cout << id << ": " << value << " , " << sunssf_[scaler] << std::endl;
                 value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "acc16") {
-                float value = register_block[offset];
+                uint16_t value = register_block[offset];
                 if (sunssf_.count(scaler) == 0){
                     float scale = SunSpecModel::BlockToScaler(
                         register_block, scaler
-                    );                    
-                } 
+                    );
+                    sunssf_[scaler] = scale;
+                }
 
-                std::cout << id << ": " << value << " , " << scale << std::endl;
                 value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "int32") {
@@ -107,10 +108,10 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                 if (sunssf_.count(scaler) == 0){
                     float scale = SunSpecModel::BlockToScaler(
                         register_block, scaler
-                    );                    
-                } 
+                    );
+                    sunssf_[scaler] = scale;
+                }
 
-                std::cout << id << ": " << value << " , " << scale << std::endl;
                 value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "float32") {
@@ -118,21 +119,21 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                 if (sunssf_.count(scaler) == 0){
                     float scale = SunSpecModel::BlockToScaler(
                         register_block, scaler
-                    );                    
-                } 
+                    );
+                    sunssf_[scaler] = scale;
+                }
 
-                std::cout << id << ": " << value << " , " << scale << std::endl;
                 value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "acc32") {
-                float value = SunSpecModel::GetUINT32(register_block,offset);
+                uint32_t value = SunSpecModel::GetUINT32(register_block,offset);
                 if (sunssf_.count(scaler) == 0){
                     float scale = SunSpecModel::BlockToScaler(
                         register_block, scaler
-                    );                    
-                } 
+                    );
+                    sunssf_[scaler] = scale;
+                }
 
-                std::cout << id << ": " << value << " , " << scale << std::endl;
                 value = value * sunssf_[scaler];
                 point_map[id] = std::to_string(value);
             } else if (type == "enum16") {
@@ -147,7 +148,6 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                             std::string attr = symbol.get <std::string> (
                                 "<xmlattr>.id",""
                             );
-                            std::cout << id << ": " << attr << std::endl;
                             point_map[id] = attr;
                         }
                     }
@@ -166,7 +166,6 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                             std::string attr = symbol.get <std::string> (
                                 "<xmlattr>.id",""
                             );
-                            std::cout << id << ": " << attr << std::endl;
                             point_map[id] = attr;
                         }
                     }
@@ -205,7 +204,6 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                 } else {
                     point_map[id] = "";
                 }
-                std::cout << id << ": " << sym << std::endl;
             } else if (type == "bitfield32") {
                 std::vector <std::string> symbols;
                 std::string sym;
@@ -242,10 +240,8 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                 } else {
                     point_map[id] = "";
                 }
-                std::cout << id << ": " << sym << std::endl;
             } else if (type == "sunssf") {
                 int16_t value = register_block[offset];
-                std::cout << id << ": " << value << std::endl;
                 point_map[id] = std::to_string(value);
             } else if (type == "string") {
                 unsigned int length;
@@ -253,7 +249,6 @@ std::map <std::string, std::string> SunSpecModel::BlockToPoints (
                 std::string value = SunSpecModel::GetString (
                     register_block, offset, length
                 );
-                std::cout << id << ": " << value << std::endl;
                 point_map[id] = value;
             } else if (type == "pad") {
                 //TODO (TS): determine how this value is implemented.
@@ -386,68 +381,47 @@ std::vector <uint16_t> SunSpecModel::PointToRegisters (
 
             // TODO (TS): this should be configured by the smdx file
             if (type == "int16") {
-                int16_t value = std::stoi(points[id]);
+                int16_t value = std::stoi(point[id]);
                 value = value / sunssf_[scaler];
-                std::vector <uint16_t> registers (
-                    3, 
-                    {offset_ + offset, 1, value}
-                );
+                std::vector <uint16_t> registers = {(offset_ + offset), 1, value};
                 std::cout << id << ": " << value << std::endl;
                 return registers;
             } else if (type == "uint16") {
-                uint16_t value = std::stoul(points[id]);
+                uint16_t value = std::stoul(point[id]);
                 value = value / sunssf_[scaler];
-                std::vector <uint16_t> registers (
-                    3, 
-                    {offset_ + offset, 1, value}
-                );
+                std::vector <uint16_t> registers = {(offset_ + offset), 1, value};
                 std::cout << id << ": " << value << std::endl;
                 return registers;
             } else if (type == "count") {
-                uint16_t value = std::stoul(points[id]);
+                uint16_t value = std::stoul(point[id]);
                 value = value / sunssf_[scaler];
-                std::vector <uint16_t> registers (
-                    3, 
-                    {offset_ + offset, 1, value}
-                );
+                std::vector <uint16_t> registers = {(offset_ + offset), 1, value};
                 std::cout << id << ": " << value << std::endl;
                 return registers;
             } else if (type == "acc16") {
-                uint16_t value = std::stoul(points[id]);
+                uint16_t value = std::stoul(point[id]);
                 value = value / sunssf_[scaler];
-                std::vector <uint16_t> registers (
-                    3, 
-                    {offset_ + offset, 1, value}
-                );
+                std::vector <uint16_t> registers = {(offset_ + offset), 1, value};
                 std::cout << id << ": " << value << std::endl;
                 return registers;
             } else if (type == "int32") {
-                int value = std::stoi(points[id]);
+                int32_t value = std::stoi(point[id]);
                 value = value / sunssf_[scaler];
-                std::vector <uint16_t> registers (
-                    3, 
-                    {offset_ + offset, 2, 0, 0}
-                );
+                std::vector <uint16_t> registers = {(offset_ + offset), 1, value};
                 SunSpecModel::SetUINT32(&registers, 2, value);
                 std::cout << id << ": " << value << std::endl;
                 return registers;
             } else if (type == "float32") {
-                unsigned int value = std::stoul(points[id]);
+                uint32_t value = std::stoul(point[id]);
                 value = value / sunssf_[scaler];
-                std::vector <uint16_t> registers (
-                    3, 
-                    {offset_ + offset, 2, 0, 0}
-                );
+                std::vector <uint16_t> registers = {(offset_ + offset), 1, value};
                 SunSpecModel::SetUINT32(&registers, 2, value);
                 std::cout << id << ": " << value << std::endl;
                 return registers;
             } else if (type == "acc32") {
-                unsigned int value = std::stoul(points[id]);
+                uint32_t value = std::stoul(point[id]);
                 value = value / sunssf_[scaler];
-                std::vector <uint16_t> registers (
-                    3, 
-                    {offset_ + offset, 2, 0, 0}
-                );
+                std::vector <uint16_t> registers = {(offset_ + offset), 1, value};
                 SunSpecModel::SetUINT32(&registers, 2, value);
                 std::cout << id << ": " << value << std::endl;
                 return registers;
