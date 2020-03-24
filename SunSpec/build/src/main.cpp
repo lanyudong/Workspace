@@ -5,8 +5,9 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <SunSpecModbus.h"
 #include "include/logger.h"
+#include "include/SunSpecModbus.h"
+
 
 // NAMESPACES
 using namespace std;
@@ -50,8 +51,8 @@ int main (int argc, char** argv) {
         block_map ss_inverter = inverter_.ReadBlock (102);
 
         // CONVERT BLOCK TO REGISTER POINTS
-        float freq = stof (radian_split["GS_Split_L1_Inverter_Buy_Current"]);
-        float volt = stof (radian_split["GS_Split_L2_Inverter_Buy_Current"]);
+        float freq = stof (radian_split["GS_Split_AC_Input_Frequency"]);
+        float volt = stof (radian_split["GS_Split_AC_Input_Voltage"]);
 
         // LOG DATA
         Logger ("DATA", GetLogPath ())
